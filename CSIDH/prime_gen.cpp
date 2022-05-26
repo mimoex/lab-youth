@@ -1,5 +1,6 @@
 #include <iostream>
 #include <mpirxx.h>
+#include <random>
 
 using namespace std;
 
@@ -11,10 +12,10 @@ int main(void)
     int i;
     mpz_class qq, p;
 
-    //乱数生成
+    /*** 乱数生成 ***/
     random_device rd;
     default_random_engine eng(rd());
-    uniform_int_distribution<int> distr(0, 9);  //0から9までの乱数を生成 //論文では-5から5?
+    uniform_int_distribution<int> distr(0, 10);  //0から10までの乱数を生成 //論文では-5から5?
 
     cout << "[" << ends;
     for (i = 0; i < 74; i++) {
@@ -29,7 +30,7 @@ int main(void)
     p = qq - 1;
     cout << "p=" << p << endl;
 
-    //素数判定
+    /*** 素数判定 ***/
     cout << "isPrime? :" <<ends;
     if (mpz_probab_prime_p(p.get_mpz_t(), 5) == 1) {
         cout << "True" << endl;
@@ -37,6 +38,29 @@ int main(void)
     else {
         cout << "False" << endl;
     }
+
+    /*** 鍵生成 ***/
+
+    int a[74], b[74]; //Aさんの鍵,Bさんの鍵
+
+    for (i = 0; i < 74; i++) {
+        a[i] = distr(eng);
+        b[i] = distr(eng);
+
+        
+    }
+    cout << "Aさんの鍵:" << ends;
+    for (i = 0; i < 74; i++) {
+        cout << a[i] <<" "<< ends;
+    }
+    cout << endl;
+
+    cout << "Bさんの鍵:" << ends;
+    for (i = 0; i < 74; i++) {
+        cout << b[i] << " " << ends;
+    }
+    cout << endl;
+        
 
     return 0;
 }
