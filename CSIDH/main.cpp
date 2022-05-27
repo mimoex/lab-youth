@@ -50,14 +50,30 @@ void div_check(void)
 	}
 }
 
+void ec_add_check()
+{
+	mpz_class a = 0, mod= 223;
+	Point p, q, result;
+	
+	p.x = 17; p.y = 26;
+	q.x = 56; q.y = 28;
+	p.inf = false; q.inf = false; result.inf = false;
+	result=ec_add(p, q, a, mod);
+
+	cout << "[" << p.x <<","<< p.y<<"]+[" << q.x <<","<<q.y<<"]=["<< result.x<<","<<result.y<<"]" << endl;
+}
+
 
 int main(void)
 {
 	cout << "DH鍵共有" << endl;
 	dh_key_exchange();
 
-	cout << "\n\n有限体の除算チェック" << endl;
+	cout << "\n\n除算チェック" << endl;
 	div_check();
+
+	cout << "\n\nEC add" << endl;
+	ec_add_check();
 
 
 	return 0;
