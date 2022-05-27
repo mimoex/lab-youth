@@ -10,8 +10,8 @@ int dh_key_exchange(void)
 
 	size_t n = 64;
 
-	a_sec = r.get_z_bits(128);	//Aさんの秘密鍵生成(nビットの乱数)
-	b_sec = r.get_z_bits(128);	//Bさんの秘密鍵生成(nビットの乱数)
+	a_sec = r.get_z_bits(n);	//Aさんの秘密鍵生成(nビットの乱数)
+	b_sec = r.get_z_bits(n);	//Bさんの秘密鍵生成(nビットの乱数)
 
 	cout << "Aさんの秘密値:" << a_sec << endl;
 	cout << "Bさんの秘密値:" << b_sec << endl;
