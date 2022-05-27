@@ -8,7 +8,7 @@ void add_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_clas
 
 void sub_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c)
 {
-	*c = a - b;
+	*c = (a - b);
 	*c %= p;
 }
 
@@ -16,7 +16,7 @@ void sub_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_clas
 void mul_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c)
 {
 	*c = a * b;
-	*c %= p;
+	*c = (*c%p+p)%p;
 }
 
 
