@@ -1,6 +1,6 @@
 #include "fp.h"
 
-//DHŒ®‹¤—L
+//DHéµå…±æœ‰
 int dh_key_exchange(void)
 {
 	mpz_class p = 65537, g = 3;
@@ -10,23 +10,23 @@ int dh_key_exchange(void)
 
 	size_t n = 64;
 
-	a_sec = r.get_z_bits(n);	//A‚³‚ñ‚Ì”é–§Œ®¶¬(nƒrƒbƒg‚Ì—”)
-	b_sec = r.get_z_bits(n);	//B‚³‚ñ‚Ì”é–§Œ®¶¬(nƒrƒbƒg‚Ì—”)
+	a_sec = r.get_z_bits(n);	//Aã•ã‚“ã®ç§˜å¯†éµç”Ÿæˆ(nãƒ“ãƒƒãƒˆã®ä¹±æ•°)
+	b_sec = r.get_z_bits(n);	//Bã•ã‚“ã®ç§˜å¯†éµç”Ÿæˆ(nãƒ“ãƒƒãƒˆã®ä¹±æ•°)
 
-	cout << "A‚³‚ñ‚Ì”é–§’l:" << a_sec << endl;
-	cout << "B‚³‚ñ‚Ì”é–§’l:" << b_sec << endl;
+	cout << "Aã•ã‚“ã®ç§˜å¯†å€¤:" << a_sec << endl;
+	cout << "Bã•ã‚“ã®ç§˜å¯†å€¤:" << b_sec << endl;
 
-	pow_fp(g, a_sec, &a_pub, p);	//A‚³‚ñ‚Ì‹¤—L’l
-	pow_fp(g, b_sec, &b_pub, p);	//B‚³‚ñ‚Ì‹¤—L’l
+	pow_fp(g, a_sec, p, &a_pub);	//Aã•ã‚“ã®å…±æœ‰å€¤
+	pow_fp(g, b_sec, p, &b_pub);	//Bã•ã‚“ã®å…±æœ‰å€¤
 
-	cout << "A‚³‚ñ‚Ì‹¤—L’l:" << a_pub << endl;
-	cout << "B‚³‚ñ‚Ì‹¤—L’l:" << b_pub << endl;
+	cout << "Aã•ã‚“ã®å…±æœ‰å€¤:" << a_pub << endl;
+	cout << "Bã•ã‚“ã®å…±æœ‰å€¤:" << b_pub << endl;
 
-	pow_fp(b_pub, a_sec, &s1, p);	//A‚³‚ñ‚Ìˆ—
-	pow_fp(a_pub, b_sec, &s2, p);	//B‚³‚ñ‚Ìˆ—
+	pow_fp(b_pub, a_sec, p, &s1);	//Aã•ã‚“ã®å‡¦ç†
+	pow_fp(a_pub, b_sec, p, &s2);	//Bã•ã‚“ã®å‡¦ç†
 
-	cout << "A‚ª‹‚ß‚½Œ®:" << s1 << endl;
-	cout << "B‚ª‹‚ß‚½Œ®:" << s2 << endl;
+	cout << "AãŒæ±‚ã‚ãŸéµ:" << s1 << endl;
+	cout << "BãŒæ±‚ã‚ãŸéµ:" << s2 << endl;
 
 	if (s1 - s2 == 0) {
 		cout << "OK!" << endl;
@@ -38,14 +38,14 @@ int dh_key_exchange(void)
 	}
 }
 
-//œZƒ`ƒFƒbƒN
+//é™¤ç®—ãƒã‚§ãƒƒã‚¯
 void div_check(void)
 {
 	mpz_class p = 7, a = 5, c, check_mul;
 
 	for (int i = 0; i < p; i++) {
-		div_fp(a, i, &c, p);
-		mul_fp(i, c, &check_mul, p);
+		div_fp(a, i, p, &c);
+		mul_fp(i, c, p, &check_mul);
 		cout << i << "*" << c << "=" << check_mul << endl;
 	}
 }
@@ -53,16 +53,12 @@ void div_check(void)
 
 int main(void)
 {
-	cout << "DHŒ®‹¤—L" << endl;
+	cout << "DHéµå…±æœ‰" << endl;
 	dh_key_exchange();
 
-	cout << "\n\nœZƒ`ƒFƒbƒN" << endl;
+	cout << "\n\næœ‰é™ä½“ã®é™¤ç®—ãƒã‚§ãƒƒã‚¯" << endl;
 	div_check();
 
 
 	return 0;
 }
-
-
-
-

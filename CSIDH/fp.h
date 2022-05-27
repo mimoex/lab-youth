@@ -5,16 +5,15 @@
 
 using namespace std;
 
-//—LŒÀ‘Ì‚Ì‰ÁZ	c=a+b%p
-void add_fp(const mpz_class a, const mpz_class b, mpz_class* c, const mpz_class p);
-//—LŒÀ‘Ì‚ÌŒ¸Z	c=a-b%p
-void sub_fp(const mpz_class a, const mpz_class b, mpz_class* c, const mpz_class p);
-//—LŒÀ‘Ì‚ÌæZ	c=a*b%p
-void mul_fp(const mpz_class a, const mpz_class b, mpz_class* c, const mpz_class p);
-//—LŒÀ‘Ì‚Ì‚×‚«æ	c=a^b%p
-void pow_fp(const mpz_class a, const mpz_class b, mpz_class* c, const mpz_class p);
-//—LŒÀ‘Ì‚Ì‹tŒ³	c=a^-1
-void inv_fp(const mpz_class a, mpz_class** c, const mpz_class p);
-//—LŒÀ‘Ì‚ÌœZ	c=a/b%p
-void div_fp(const mpz_class a, const mpz_class b, mpz_class* c, const mpz_class p);
-
+//æœ‰é™ä½“ã®åŠ ç®—	c=a+b%p
+void add_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c);
+//æœ‰é™ä½“ã®æ¸›ç®—	c=a-b%p
+void sub_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c);
+//æœ‰é™ä½“ã®ä¹—ç®—	c=a*b%p
+void mul_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c);
+//æœ‰é™ä½“ã®ã¹ãä¹—	c=a^b%p
+void pow_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c);
+//æœ‰é™ä½“ã®é€†å…ƒ	c=a^-1
+void inv_fp(const mpz_class& a, const mpz_class& p, mpz_class** c);
+//æœ‰é™ä½“ã®é™¤ç®—	c=a/b%p
+void div_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c);
