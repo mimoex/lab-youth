@@ -26,20 +26,20 @@ Point ec_add(Point& p, Point& q, mpz_class& a, mpz_class& mod)
 		div_fp(lambda, y_1, mod, &lambda);
 	}
 	else {
-		//x1!=x2�̂Ƃ��C
+		//x1!=x2のとき，
 		//lambda=(y2-y1)/(x2-x1)
 		sub_fp(p.y, q.y, mod, &lh);
 		sub_fp(p.x, q.x, mod, &rh);
 		div_fp(lh, rh, mod, &lambda);
 	}
 	
-	//P+Q��x���W
+	//P+Qのx座標
 	mpz_class lambda2, x_temp;
 	mul_fp(lambda, lambda, mod, &lambda2);
 	add_fp(p.x, q.x, mod, &x_temp);
 	sub_fp(lambda2, x_temp, mod, &result.x);
 
-	//P+Q��y���W
+	//P+Qのy座標
 	sub_fp(p.x, result.x, mod, &x_temp);
 	mul_fp(lambda, x_temp, mod, &lambda2);
 	sub_fp(lambda2, p.y, mod, &result.y);
