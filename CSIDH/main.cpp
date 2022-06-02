@@ -1,62 +1,44 @@
 #include "fp.h"
 
-//DH鍵共有
-int dh_key_exchange(void)
+void gen_csidh_key()
 {
-	mpz_class p = 65537, g = 3;
-	mpz_class a_sec, b_sec, a_pub, b_pub, s1,s2;
+	int i;
 
-	gmp_randclass r(gmp_randinit_default);
+	/*** 乱数生成 ***/
+	random_device rd;
+	default_random_engine eng(rd());
+	uniform_int_distribution<int> distr(0, 10);  //0から10までの乱数を生成 //論文では-5から5?
+	
+	size_t a[N], b[N]; //Aさんの鍵,Bさんの鍵
 
-	size_t n = 64;
+	for (i = 0; i < N; i++) {
+		a[i] = distr(eng);
+		b[i] = distr(eng);
 
-	a_sec = r.get_z_bits(n);	//Aさんの秘密鍵生成(nビットの乱数)
-	b_sec = r.get_z_bits(n);	//Bさんの秘密鍵生成(nビットの乱数)
 
-	cout << "Aさんの秘密値:" << a_sec << endl;
-	cout << "Bさんの秘密値:" << b_sec << endl;
-
-	pow_fp(g, a_sec, p, &a_pub);	//Aさんの共有値
-	pow_fp(g, b_sec, p, &b_pub);	//Bさんの共有値
-
-	cout << "Aさんの共有値:" << a_pub << endl;
-	cout << "Bさんの共有値:" << b_pub << endl;
-
-	pow_fp(b_pub, a_sec, p, &s1);	//Aさんの処理
-	pow_fp(a_pub, b_sec, p, &s2);	//Bさんの処理
-
-	cout << "Aが求めた鍵:" << s1 << endl;
-	cout << "Bが求めた鍵:" << s2 << endl;
-
-	if (s1 - s2 == 0) {
-		cout << "OK!" << endl;
-		return 0;
 	}
-	else {
-		cout << "NG" << endl;
-		return -1;
+	cout << "Aさんの鍵:" << ends;
+	for (i = 0; i < N; i++) {
+		cout << a[i] << " " << ends;
 	}
+	cout << endl;
+
+	cout << "Bさんの鍵:" << ends;
+	for (i = 0; i < N; i++) {
+		cout << b[i] << " " << ends;
+	}
+	cout << endl;
+
 }
 
-//除算チェック
-void div_check(void)
-{
-	mpz_class p = 7, a = 5, c, check_mul;
-
-	for (int i = 0; i < p; i++) {
-		div_fp(a, i, p, &c);
-		mul_fp(i, c, p, &check_mul);
-		cout << i << "*" << c << "=" << check_mul << endl;
-	}
-}
 
 void ec_add_check()
 {
-	mpz_class a = 0, mod= 223;
+	mpz_class a = 7, mod= 97;
 	Point p, q, result;
 	
-	p.x = 17; p.y = 26;
-	q.x = 56; q.y = 28;
+	p.x = 24; p.y = 11;
+	q.x = 96; q.y = 34;
 	p.inf = false; q.inf = false; result.inf = false;
 	result=ec_add(p, q, a, mod);
 
@@ -64,17 +46,64 @@ void ec_add_check()
 }
 
 
-int main(void)
+Point binary_m(Point* p, const mpz_class* a, const mpz_class* mod, const mpz_class* n)
 {
-	cout << "DH鍵共有" << endl;
-	dh_key_exchange();
+	string bit;
+	size_t bit_size;
+	Point result, temp_point;
+	result.inf = true;
+	temp_point = copy_point(*p);
 
-	cout << "\n\n除算チェック" << endl;
-	div_check();
+	bit = n->get_str(2);
+	bit_size = bit.size();
 
-	cout << "\n\nEC add" << endl;
-	ec_add_check();
+	cout << "n=" << *n <<" = 0b"<< bit << endl;
+
+	result = *p;
+
+	for (int i = bit_size-2; i >=0; i--) {
+		result = ec_add(result, result, *a, *mod);	//doubling
+
+		cout << "i: " << bit[i] << endl;
+		if (bit[bit_size - i - 1] == '1') {
+			result = ec_add(result, temp_point, *a, *mod);	//addition
+		}
+
+				
+	}
+	return result;
+	
+}
+
+void binary_check()
+{
+	mpz_class a = 1, mod;
+	mpz_class n = 3;
+	Point p, result;
+
+	//mod=gen_prime();
+	mod = 97;
+	cout << "p="<<mod << endl;
+
+	p.x = 31; p.y = 72;
+	p.inf = false; result.inf = false;
+	for (n = 0; n < 10; n++) {
+		result = binary_m(&p, &a, &mod, &n);
+		cout << "nP=" << n << "[" << p.x << ", " << p.y << "] = [" << result.x << ", " << result.y << "]" << endl;
+
+	}
+
+}
 
 
-	return 0;
+
+
+
+int main()
+{
+
+	binary_check();
+
+	//gen_csidh_key();
+
 }
