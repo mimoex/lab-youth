@@ -46,27 +46,26 @@ void ec_add_check()
 }
 
 
-Point binary_m(Point* p, const mpz_class* a, const mpz_class* mod, const mpz_class* n)
+Point l_to_r_binary(Point& p, const mpz_class& a, const mpz_class& mod, const mpz_class& n)
 {
 	string bit;
 	size_t bit_size;
 	Point result, temp_point;
 	result.inf = true;
-	temp_point = copy_point(*p);
+	temp_point = copy_point(p);
 
-	bit = n->get_str(2);
+	bit = n.get_str(2);
 	bit_size = bit.size();
 
-	cout << "n=" << *n <<" = 0b"<< bit << endl;
+	cout << "n=" << n <<" = 0b"<< bit << endl;
 
-	result = *p;
+	result = p;
 
 	for (int i = bit_size-2; i >=0; i--) {
-		result = ec_add(result, result, *a, *mod);	//doubling
+		result = ec_add(result, result, a, mod);	//double
 
-		cout << "i: " << bit[i] << endl;
 		if (bit[bit_size - i - 1] == '1') {
-			result = ec_add(result, temp_point, *a, *mod);	//addition
+			result = ec_add(result, temp_point, a, mod);	//add
 		}
 
 				
@@ -88,8 +87,8 @@ void binary_check()
 	p.x = 31; p.y = 72;
 	p.inf = false; result.inf = false;
 	for (n = 0; n < 10; n++) {
-		result = binary_m(&p, &a, &mod, &n);
-		cout << "nP=" << n << "[" << p.x << ", " << p.y << "] = [" << result.x << ", " << result.y << "]" << endl;
+		result = l_to_r_binary(p, a, mod, n);
+		cout << "nP=" << n << "[" << p.x << ", " << p.y << "] = [" << result.x << ", " << result.y << "]\n" << endl;
 
 	}
 
