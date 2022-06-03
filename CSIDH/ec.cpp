@@ -1,7 +1,7 @@
 #include "fp.h"
 
 
-Point ec_add(Point& p, Point& q, mpz_class& a, mpz_class& mod)
+Point ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& mod)
 {
 	if (p.inf) return q;
 	if (q.inf) return p;
@@ -47,6 +47,91 @@ Point ec_add(Point& p, Point& q, mpz_class& a, mpz_class& mod)
 	sub_fp(lambda2, p.y, mod, &result.y);
 
 	return result;
+}
+
+
+
+//Montgomery Curve
+Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& b, const mpz_class& mod)
+{
+	if (p.inf) { return q; cout << "p is inf" << endl; }
+	if (q.inf) { return p; cout << "q is inf" << endl; }
+
+	mpz_class x_temp, y_1, lambda;
+	mpz_class lh, rh;
+	Point result;
+
+
+	//cout << "Px,Qx:" << p.x << "," << q.x << endl;
+	if (p.x == q.x) {
+		//P + (-P) = 0
+		//cout << "Py,-Py:" << p.y << "," << -q.y << endl;
+		if (p.y == -q.y) {
+			p.inf = true;
+			return p;
+		}
+		//x1!=x2のとき，
+		//
+		//x3 = b*(3*x1^2+2*a*x1+1)^2/(2*b*y1)^2-a-x1-x1
+
+		//y3 = (2*x1+x1+a)*(3*x1^2+2*a*x1+1)/(2*b*y1)-b*(3*x1^2+2*a*x1+1)^3/(2*b*y1)^3-y1
+
+	}
+	else {
+		//x1!=x2のとき，
+		// 
+		// x3 = b*(y2-y1)^2/(x2-x1)^2-a-x1-x2
+
+		mpz_class llh, lrh, y_ltemp, subx2x1, suby2y1;
+
+		sub_fp(q.x, p.x, mod, &subx2x1);	//x2-x1
+		sub_fp(q.y, p.y, mod, &suby2y1);	//y2-y1
+
+		mul_fp(suby2y1, suby2y1, mod, &lh);
+		mul_fp(b, lh, mod, &lh);
+
+		mul_fp(subx2x1, subx2x1, mod, &rh);
+
+		div_fp(lh, rh, mod, &x_temp);
+
+		sub_fp(x_temp, a, mod, &x_temp);
+		sub_fp(x_temp, p.x, mod, &x_temp);
+		sub_fp(x_temp, q.x, mod, &result.x);
+
+
+		// y3 = (2*x1+x2+a)*(y2-y1)/(x2-x1)-b*(y2-y1)^3/(x2-x1)^3-y1
+		//
+		//左辺
+		mul_fp(2, p.x, mod, &llh);
+		add_fp(llh, q.x, mod, &llh);
+		add_fp(llh, a, mod, &llh);
+		mul_fp(llh, suby2y1, mod, &y_ltemp);
+
+		div_fp(y_ltemp, subx2x1, mod, &y_ltemp);
+
+		//右辺
+		pow_fp(suby2y1, 3, mod, &lh);
+		mul_fp(b, lh, mod, &lh);
+
+		pow_fp(subx2x1, 3, mod, &rh);
+
+		div_fp(lh, rh, mod, &lrh);
+
+		sub_fp(y_ltemp, lrh, mod, &y_ltemp);
+		sub_fp(y_ltemp, q.y, mod, &result.y);
+	}
+	return result;
+}
+
+
+
+
+Point copy_point(Point &p) {
+	Point result;
+	result.x= p.x;
+	result.y= p.y;
+	result.inf = p.inf;
+	return p;
 }
 
 
