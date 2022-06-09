@@ -3,8 +3,8 @@
 
 Point ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& mod)
 {
-	if (p.inf) return q;
-	if (q.inf) return p;
+	if (p.inf) { return q; cout << "p is inf" << endl; }
+	if (q.inf) { return p; cout << "q is inf" << endl; }
 
 	mpz_class lambda_temp, y_1, lambda;
 	mpz_class lh, rh;
@@ -31,7 +31,7 @@ Point ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& mod)
 		//lambda=(y2-y1)/(x2-x1)
 		sub_fp(p.y, q.y, mod, &lh);
 		sub_fp(p.x, q.x, mod, &rh);
-		div_fp(lh, rh, mod, &lambda);
+		div_fp(lh, rh, mod, &lambda);	
 	}
 	
 	//P+Qのx座標
@@ -59,7 +59,7 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 
 	mpz_class x_temp, y_1, lambda;
 	mpz_class lh, rh;
-	Point result;
+	Point result, temp;
 
 
 	//cout << "Px,Qx:" << p.x << "," << q.x << endl;
@@ -70,11 +70,52 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 			p.inf = true;
 			return p;
 		}
+		cout << "double" << endl;
 		//x1!=x2のとき，
 		//
 		//x3 = b*(3*x1^2+2*a*x1+1)^2/(2*b*y1)^2-a-x1-x1
+		//A=3*x1, B=(A^2+2*a*x1+1), lh=b*B^2, C=2*b*y1, D=C^2
+		mpz_class A, A2, B, B1, C, D;
+		mul_fp(3, p.x, mod, &A);
+
+		mul_fp(2, a, mod, &B1);
+		mul_fp(B1, p.x, mod, &B1);
+
+		pow_fp(A, 2, mod, &A2);
+
+		add_fp(A2, B1, mod, &B);
+		add_fp(B, 1, mod, &B);
+
+		pow_fp(B, 2, mod, &lh);
+
+
+		mul_fp(2, b, mod, &C);
+		mul_fp(C, p.y, mod, &C);
+
+		div_fp(lh, rh, mod, &lambda);
+
+		pow_fp(lambda, 2, mod, &D);
+		mul_fp(b, D, mod, &D);
+		sub_fp(D, a, mod, &D);
+		sub_fp(rh, p.x, mod, &D);
+		sub_fp(rh, p.x, mod, &result.x);
+
+		
 
 		//y3 = (2*x1+x1+a)*(3*x1^2+2*a*x1+1)/(2*b*y1)-b*(3*x1^2+2*a*x1+1)^3/(2*b*y1)^3-y1
+		//A=2*x1, A=A+x1, A=A+a, B=A*lambda, C=lambda^3, C=b*C, D=B-C-y1
+		mul_fp(2, p.x, mod, &A);
+		add_fp(A, p.x, mod, &A);
+		add_fp(A, a, mod, &A);
+
+		mul_fp(A, lambda, mod, &B);
+
+		pow_fp(lambda, 3, mod, &C);
+		mul_fp(b, C, mod, &C);
+
+		sub_fp(B, C, mod, &D);
+		sub_fp(D, p.y, mod, &result.y);
+
 
 	}
 	else {
@@ -87,10 +128,10 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 		sub_fp(q.x, p.x, mod, &subx2x1);	//x2-x1
 		sub_fp(q.y, p.y, mod, &suby2y1);	//y2-y1
 
-		mul_fp(suby2y1, suby2y1, mod, &lh);
+		pow_fp(suby2y1, 2, mod, &lh);
 		mul_fp(b, lh, mod, &lh);
 
-		mul_fp(subx2x1, subx2x1, mod, &rh);
+		pow_fp(subx2x1, 2, mod, &rh);
 
 		div_fp(lh, rh, mod, &x_temp);
 
@@ -144,6 +185,10 @@ mpz_class gen_prime()
 		qq *= prime[i];
 	}
 	p = qq - 1;
+	cout << p << endl;
+	string bit;
+	bit=p.get_str(2); 
+	cout << bit.size() << endl;
 	return p;
 }
 
