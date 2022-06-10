@@ -10,8 +10,11 @@ Point ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& mod)
 	mpz_class lh, rh;
 	Point result;
 
+
+	//cout << "Px,Qx:" << p.x << "," << q.x << endl;
 	if (p.x == q.x) {
 		//P + (-P) = 0
+		//cout << "Py,-Py:" << p.y << "," << -q.y << endl;
 		if ((p.y + q.y == mod) || (p.y == q.y && p.y == 0)) {
 			p.inf = true;
 			return p;
@@ -69,11 +72,11 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 			p.inf = true;
 			return p;
 		}
-		cout << "double" << endl;
 		//x1!=x2のとき，
 		//
 		//x3 = b*(3*x1^2+2*a*x1+1)^2/(2*b*y1)^2-a-x1-x1
 		//A=3*x1, B=(A^2+2*a*x1+1), lh=b*B^2, C=2*b*y1, D=C^2
+
 		mpz_class A, A2, B, B1, C, C1, D, D1;
 		pow_fp(p.x, 2, mod, &A);
 		mul_fp(3, A, mod, &A2);
@@ -137,8 +140,6 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 }
 
 
-
-
 Point copy_point(Point &p) {
 	Point result;
 	result.x= p.x;
@@ -146,21 +147,3 @@ Point copy_point(Point &p) {
 	result.inf = p.inf;
 	return p;
 }
-
-
-mpz_class gen_prime()
-{
-	int i;
-	mpz_class p, qq;
-	qq = 4;
-	for (i = 0; i < N; i++) {
-		qq *= prime[i];
-	}
-	p = qq - 1;
-	cout << p << endl;
-	string bit;
-	bit=p.get_str(2); 
-	cout << bit.size() << endl;
-	return p;
-}
-
