@@ -112,3 +112,23 @@ void div_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_clas
 	mul_fp(a, *c, p, c);
 
 }
+
+//有限体pから乱数生成
+mpz_class fp_random(const mpz_class& p)
+{
+	mpz_class x, cnt;
+	size_t n = 512;
+
+	random_device rnd;
+	gmp_randclass r(gmp_randinit_default);
+	r.seed(rnd());
+
+	while (1) {
+		x = r.get_z_bits(n);
+		cnt++;
+
+		if (x < p) {
+			return x;
+		}
+	}
+}
