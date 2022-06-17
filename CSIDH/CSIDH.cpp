@@ -47,3 +47,28 @@ mpz_class gen_prime()
 	cout << bit.size() << endl;
 	return p;
 }
+
+
+//Veluの公式
+Point Velu(Point& P, const mpz_class& a, const mpz_class& b, const mpz_class& l_i, const mpz_class& p)
+{
+	Point Q, result;
+	mpz_class tQ, uQ, wQ;
+	mpz_class t=0, w=0;
+	int i;
+
+	for (i = 0; i < l_i; i++) {
+		Q = montgomery_ec_add(P, Q, a, b, p);
+
+		tQ= 3 * Q.x *Q.x + a;
+		uQ = 2 * Q.y * Q.y;
+		wQ = uQ + tQ * Q.x;
+
+		t += tQ;
+		w += wQ;
+	}
+	result.x = a - 5 * t;
+	result.y = b - 7 * w;
+	
+	return result;
+}
