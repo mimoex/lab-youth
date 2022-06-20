@@ -1,6 +1,5 @@
 #include "fp.h"
 
-
 Point ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& mod)
 {
 	if (p.inf) return q;
@@ -56,8 +55,8 @@ Point ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& mod)
 //Montgomery Curve
 Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& b, const mpz_class& mod)
 {
-	if (p.inf) { return q; cout << "p is inf" << endl; }
-	if (q.inf) { return p; cout << "q is inf" << endl; }
+	if (p.inf) return q;
+	if (q.inf) return p;
 
 	mpz_class x_temp, y_1, lambda;
 	mpz_class lh, rh;
@@ -104,13 +103,9 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 		mul_fp(lambda, temp10, mod, &temp11);
 		sub_fp(temp11, p.y, mod, &result.y);
 
-
-
-
 	}
 	else {
 		//x1!=x2のとき，
-		// 
 		// x3 = b*(y2-y1)^2/(x2-x1)^2-a-x1-x2
 
 		sub_fp(q.y, p.y, mod, &lh);
@@ -125,16 +120,12 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 		sub_fp(result.x, p.x, mod, &result.x);
 		sub_fp(result.x, q.x, mod, &result.x);
 
-
-
 		// y3 = (2*x1+x2+a)*(y2-y1)/(x2-x1)-b*(y2-y1)^3/(x2-x1)^3-y1
-		//
 		//左辺
 		mpz_class temp10, temp11;
 		sub_fp(p.x, result.x, mod, &temp10);
 		mul_fp(lambda, temp10, mod, &temp11);
 		sub_fp(temp11, p.y, mod, &result.y);
-		
 	}
 	return result;
 }
@@ -146,4 +137,52 @@ Point copy_point(Point &p) {
 	result.y= p.y;
 	result.inf = p.inf;
 	return p;
+}
+
+
+
+/*** xを選んでからyを求める(未使用) ***/
+mpz_class gen_y(const Point& p, const mpz_class& mod) {
+	mpz_class y, x_cube, y_sqr;
+	int test;
+	pow_fp(p.x, 3, mod, &x_cube);
+	add_fp(x_cube, p.x, mod, &y_sqr);
+	mpz_sqrt(y.get_mpz_t(), y_sqr.get_mpz_t());
+	return y;
+}
+
+/*** y^2=x^3+xのポイントを生成
+	ベースポイントから乱数をスカラー倍としてポイントを生成***/
+Point gen_point(const mpz_class& a, const mpz_class& b, const mpz_class& mod)
+{
+	/*** 乱数生成 ***/
+	random_device rnd;
+	gmp_randclass r(gmp_randinit_default);
+	r.seed(rnd());
+
+	size_t n = 256;
+	mpz_class rand_num;
+
+	Point p, gen_point;
+	p.x = "1486724546773817160185706994400590876325221178963600688050988942095980519360894027838516528686056471052894965680483000185749997971778637728426028358414319";
+	p.y = "3607689279296022073046436556648074498611954478353744067528678254744301698398578854112928964964392932579386282175432815139942539613739773902651999377835184";
+
+	rand_num = r.get_z_bits(n);
+
+	gen_point = l_to_r_binary_mont(p, a, b, mod, rand_num);
+	return gen_point;
+}
+
+/*** y^2=x^3+xのの点であれば0を返す ***/
+size_t check_point(const Point& p, const mpz_class& mod)
+{
+	mpz_class test, x_cube, y_sqr, rh;
+	pow_fp(p.x, 3, mod, &x_cube);
+	add_fp(x_cube, p.x, mod, &rh);
+
+	mul_fp(p.y, p.y, mod, &y_sqr);
+	sub_fp(rh, y_sqr, mod, &test);
+
+	if (test == 0)	return 0;
+	else			return 1;
 }
