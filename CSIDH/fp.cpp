@@ -24,7 +24,7 @@ void sub_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_clas
 void mul_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c)
 {
 	*c = a * b;
-	*c = *c % p;
+	*c %= p;
 }
 
 
@@ -38,8 +38,8 @@ void pow_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_clas
 void inv_fp(const mpz_class& a, const mpz_class& p, mpz_class* c)
 {
 	if (a == 0) {
-		cout << "zero inv" << endl;
-		*c = 0;
+		throw std::range_error("Divided by zero.");
+		//*c = 0;
 
 	}
 	else {
@@ -107,8 +107,8 @@ int algo5_inv(const mpz_class& A, const mpz_class& p, mpz_class* c)
 
 void div_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c)
 {
-	algo5_inv(b, p, c);
-	//inv_fp(b, p, c);
+	//algo5_inv(b, p, c);
+	inv_fp(b, p, c);
 	mul_fp(a, *c, p, c);
 
 }
