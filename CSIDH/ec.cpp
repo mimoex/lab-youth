@@ -71,7 +71,7 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 			p.inf = true;
 			return p;
 		}
-		//x1!=x2のとき，
+		//x1=x2のとき，
 		//
 		//x3 = b*(3*x1^2+2*a*x1+1)^2/(2*b*y1)^2-a-x1-x1
 		//A=3*x1, B=(A^2+2*a*x1+1), lh=b*B^2, C=2*b*y1, D=C^2
@@ -127,6 +127,7 @@ Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class&
 		mul_fp(lambda, temp10, mod, &temp11);
 		sub_fp(temp11, p.y, mod, &result.y);
 	}
+	result.inf = false;
 	return result;
 }
 
@@ -160,13 +161,13 @@ Point gen_point(const mpz_class& a, const mpz_class& b, const mpz_class& mod)
 	gmp_randclass r(gmp_randinit_default);
 	r.seed(rnd());
 
-	size_t n = 256;
+	size_t n = 512;
 	mpz_class rand_num;
 
 	Point p, gen_point;
 	p.x = "1486724546773817160185706994400590876325221178963600688050988942095980519360894027838516528686056471052894965680483000185749997971778637728426028358414319";
 	p.y = "3607689279296022073046436556648074498611954478353744067528678254744301698398578854112928964964392932579386282175432815139942539613739773902651999377835184";
-
+	p.inf = false;
 	rand_num = r.get_z_bits(n);
 
 	gen_point = l_to_r_binary_mont(p, a, b, mod, rand_num);
