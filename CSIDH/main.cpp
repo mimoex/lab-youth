@@ -145,6 +145,23 @@ void x25519()
 
 int main()
 {
+	chrono::system_clock::time_point start, end;
+	start = std::chrono::system_clock::now();
+	int err = 0;
+
+	////OpenMPを使った並列テスト
+	//#pragma omp parallel 
+	//{
+	//	#pragma omp for reduction(+:err)
+	//	for (int i = 0; i < 200; i++) {
+	//		err += x25519();
+	//	}
+	//}
+	//cout << "err:" << err << endl;
+	
 	x25519();
 
+	end = std::chrono::system_clock::now();
+	double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	cout << "time: " << elapsed << endl;
 }
