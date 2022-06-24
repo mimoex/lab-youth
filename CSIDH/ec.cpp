@@ -174,15 +174,22 @@ Point gen_point(const mpz_class& a, const mpz_class& b, const mpz_class& mod)
 	return gen_point;
 }
 
-/*** y^2=x^3+xのの点であれば0を返す ***/
-size_t check_point(const Point& p, const mpz_class& mod)
+/*** b*y^2=x^3+a*x^2+xのの点であれば0を返す ***/
+size_t check_point(const Point& p, const mpz_class a, const mpz_class b, const mpz_class& mod)
 {
-	mpz_class test, x_cube, y_sqr, rh;
+	mpz_class test, x_cube, x_sqr, y_sqr, rh, lh, ax2;
 	pow_fp(p.x, 3, mod, &x_cube);
-	add_fp(x_cube, p.x, mod, &rh);
 
-	mul_fp(p.y, p.y, mod, &y_sqr);
-	sub_fp(rh, y_sqr, mod, &test);
+	pow_fp(p.x, 2, mod, &x_sqr);
+	mul_fp(a, x_sqr, mod, &ax2);
+
+	add_fp(x_cube, ax2, mod, &rh);
+	add_fp(rh, p.x, mod, &rh);
+
+	pow_fp(p.y, 2, mod, &y_sqr);
+	mul_fp(b, y_sqr, mod, &lh);
+	sub_fp(rh, lh, mod, &test);
+
 
 	if (test == 0)	return 0;
 	else			return 1;

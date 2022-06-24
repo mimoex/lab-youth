@@ -6,27 +6,27 @@ size_t Velu(Point& P, mpz_class& a, mpz_class& b, const mpz_class& order, const 
 	//if (check_point(P, mod) == 1) { cout << "違う" << endl; return 1; }
 
 	Point Q, result;
-	mpz_class tQ, uQ, wQ;
+	mpz_class tQ, tQtemp, uQ, uQtemp, wQ, wQtemp;
 	mpz_class t = 0, w = 0;
 	int i;
 
 	Q.x = 0; Q.y = 0; Q.inf = true;
 
-	for (i = 0; i < order; i++) {
+	for (i = 1; i < order; i++) {
 		Q = montgomery_ec_add(P, Q, a, b, mod);
 
 		//tQ = 3 * Q.x * Q.x + a;
 		pow_fp(Q.x, 2, mod, &tQ);
-		mul_fp(3, tQ, mod, &tQ);
-		add_fp(tQ, a, mod, &tQ);
+		mul_fp(3, tQ, mod, &tQtemp);
+		add_fp(tQtemp, b, mod, &tQ);
 		
 		//uQ = 2 * Q.y * Q.y;
-		pow_fp(Q.y, 2, mod, &uQ);
-		mul_fp(2, uQ, mod, &uQ);
+		pow_fp(Q.y, 2, mod, &tQtemp);
+		mul_fp(2, tQtemp, mod, &uQ);
 
 		//wQ = uQ + tQ * Q.x;
-		mul_fp(tQ, Q.x, mod, &wQ);
-		add_fp(uQ, wQ, mod, &wQ);
+		mul_fp(tQ, Q.x, mod, &wQtemp);
+		add_fp(uQ, wQtemp, mod, &wQ);
 
 		//t += tQ;
 		add_fp(t, tQ, mod, &t);
@@ -38,9 +38,9 @@ size_t Velu(Point& P, mpz_class& a, mpz_class& b, const mpz_class& order, const 
 	//w *= 7;
 	mul_fp(w, 7, mod, &w);
 	//a -= t;
-	sub_fp(a, t, mod, &a);
+	sub_fp(b, t, mod, &b);
 	//b -= w;
-	sub_fp(b, w, mod, &b);
+	sub_fp(a, w, mod, &a);
 	return 0;
 }
 
@@ -93,25 +93,25 @@ void gen_csidh_key()
 			check=0;
 			while (check == 0) {
 				PA = gen_point(A_curve_a, A_curve_b, mod);
-				if (check_point(PA, mod) == 0) cout<<"ellisoncurve-OK"<<endl;
+				if (check_point(PA, A_curve_a, A_curve_b, mod) == 0) cout<<"ellisoncurve-OK"<<endl;
 				//cout << "inf?:" << PA.inf << ends;
 				add_fp(mod, 1, mod, &add_temp);
 				div_fp(add_temp, primes[i], mod, &bai);
 				//cout << bai << endl;
 				PA=l_to_r_binary_mont(PA, A_curve_a, A_curve_b, mod, bai);
-				if (check_point(PA, mod) == 0) cout << "ellisoncurve-OK2" << endl;
+				if (check_point(PA, A_curve_a, A_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
 				//cout << "inf(af scalar)?:" << PA.inf << endl;
 				//cout << "PA:" << PA.x << ", " << PA.y << endl;
-				if (PA.inf==0) {
+				if (PA.inf==false) {
 					//cout << "check OK!" << endl;
 					check = 1;
 				}
 			}
 			//Pの位数はl[i]
 			cout << " " << primes[i] << ends;
-			//cout << "P:" << P.x << ", " << P.y << endl;
+			//cout << "a, b;" << A_curve_a << ", " << A_curve_b << endl;
 			Velu(PA, A_curve_a, A_curve_b, primes[i], mod);
-			cout << "AA:" << A_curve_a << ", " << A_curve_b << endl;
+			//cout << "AA:" << A_curve_a << ", " << A_curve_b << endl;
 		}
 		cout << ", " << ends;
 	}
@@ -174,7 +174,7 @@ void gen_csidh_key()
 			//Pの位数はl[i]
 			cout << " " << primes[i] << ends;
 			Velu(PBA, BA_curve_a, BA_curve_b, primes[i], mod);
-			cout <<  BA_curve_a << ", " << BA_curve_b << endl;
+			//cout <<  BA_curve_a << ", " << BA_curve_b << endl;
 		}
 		cout << ", " << ends;
 	}
