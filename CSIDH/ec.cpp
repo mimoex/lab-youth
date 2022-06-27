@@ -187,17 +187,11 @@ mpz_class TonelliShanks(const mpz_class & n, const mpz_class & mod)
 /*** xを選んでからyを求める
 	y^2=x^3+a*x^2+x***/
 Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mod) {
-	/*** 乱数生成 ***/
-	random_device rnd;
-	gmp_randclass r(gmp_randinit_default);
-	r.seed(rnd());
-
-	size_t n = 256;
 	Point result;
 	result.inf = false;
+	size_t mask_bit = 32;
 	mpz_class x, y, x_cube, x_sqr, y_temp, ax2, rh, sqrt_result;
-	result.x = r.get_z_bits(n);
-	result.x <<= 0;
+	result.x = random_fp(mod);
 	int sqrt_check = 0;
 
 	while (sqrt_check == 0) {
@@ -227,7 +221,10 @@ Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mo
 }
 
 /*** y^2=x^3+xのポイントを生成
-	ベースポイントから乱数をスカラー倍としてポイントを生成***/
+	ベースポイントから乱数をスカラー倍としてポイントを生成
+	(未使用) 危険なので使わない
+	2つのスカラーa,bからaPとbPを生成したときに，離散対数問題が解けてしまうおそれあり
+	***/
 Point gen_point(const mpz_class& a, const mpz_class& b, const mpz_class& mod)
 {
 	/*** 乱数生成 ***/

@@ -114,10 +114,14 @@ void div_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_clas
 }
 
 //有限体pから乱数生成
-mpz_class fp_random(const mpz_class& p)
+mpz_class random_fp(const mpz_class& p)
 {
 	mpz_class x, cnt;
-	size_t n = 512;
+	size_t n;
+	string bit;
+
+	bit = p.get_str(2);
+	n = bit.size();
 
 	random_device rnd;
 	gmp_randclass r(gmp_randinit_default);

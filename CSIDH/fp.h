@@ -32,6 +32,9 @@ void pow_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_clas
 void inv_fp(const mpz_class& a, const mpz_class& p, mpz_class* c);
 //有限体の除算	c=a/b%p
 void div_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_class* c);
+//p以下の乱数を生成
+mpz_class random_fp(const mpz_class& p);
+
 
 Point copy_point(Point& p);
 
