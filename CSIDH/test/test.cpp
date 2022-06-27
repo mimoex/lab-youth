@@ -100,6 +100,16 @@ void CSIDH1()
 
 }
 
+void TonelliShanks_test()
+{
+	mpz_class n, p, result;
+	n = "41660815127637347468140745042827704103445750172002";
+	p = "100000000000000000000000000000000000000000000000577";
+
+	result = TonelliShanks(n, p);
+	cout << result << endl;
+}
+
 
 //テスト main関数
 /*

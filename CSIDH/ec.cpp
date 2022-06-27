@@ -141,15 +141,89 @@ Point copy_point(Point &p) {
 }
 
 
+//Tonelli-Shanks algorithm (参考：https://en.wikipedia.org/wiki/Tonelli-Shanks_algorithm)
+mpz_class TonelliShanks(const mpz_class & n, const mpz_class & mod)
+{
+	mpz_class s,r, q, result;
+	s = 0;
+	q = mod - 1;
+	while ((q & 1) == 0) { q /= 2; ++s; }
+	if (s == 1) {
+		pow_fp(n, (mod + 1) / 4, mod, &r);
+		if ((r * r) % mod == n) return r;
+		return 0;
+	}
+	// Find the first quadratic non-residue z by brute-force search
+	mpz_class z, c, t,tt, m, check2,b,b2, check3;
+	z = 1;
+	while ( check2 != mod - 1) pow_fp(++z, (mod - 1) / 2, mod, &check2);
+	pow_fp(z, q, mod,&c);
+	pow_fp(n, (q + 1) / 2, mod,&r);
+	pow_fp(n, q, mod,&t);
+	m = s;
+	while (t != 1) {
+		tt = t;
+		int i = 0;
+		while (tt != 1) {
+			tt = (tt * tt) % mod;
+			++i;
+			if (i == m) return 0;
+		}
+		pow_fp(2, m - i - 1, mod - 1, &check3);
+		pow_fp(c, check3, mod,&b);
+		b2 = (b * b) % mod;
+		r = (r * b) % mod;
+		t = (t * b2) % mod;
+		c = b2;
+		m = i;
+	}
+	if ((r * r) % mod == n) return r;
+	return 0;
+}
 
-/*** xを選んでからyを求める(未使用) ***/
-mpz_class gen_y(const Point& p, const mpz_class& mod) {
-	mpz_class y, x_cube, y_sqr;
-	int test;
-	pow_fp(p.x, 3, mod, &x_cube);
-	add_fp(x_cube, p.x, mod, &y_sqr);
-	mpz_sqrt(y.get_mpz_t(), y_sqr.get_mpz_t());
-	return y;
+
+
+
+/*** xを選んでからyを求める
+	y^2=x^3+a*x^2+x***/
+Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mod) {
+	/*** 乱数生成 ***/
+	random_device rnd;
+	gmp_randclass r(gmp_randinit_default);
+	r.seed(rnd());
+
+	size_t n = 256;
+	Point result;
+	result.inf = false;
+	mpz_class x, y, x_cube, x_sqr, y_temp, ax2, rh, sqrt_result;
+	result.x = r.get_z_bits(n);
+	result.x <<= 0;
+	int sqrt_check = 0;
+
+	while (sqrt_check == 0) {
+		pow_fp(result.x, 3, mod, &x_cube);
+
+		pow_fp(result.x, 2, mod, &x_sqr);
+		mul_fp(a, x_sqr, mod, &ax2);
+
+		add_fp(x_cube, ax2, mod, &y_temp);
+		add_fp(y_temp, result.x, mod, &rh);
+		
+		//mpz_sqrt(result.y.get_mpz_t(), rh.get_mpz_t());
+		sqrt_result = TonelliShanks(rh, mod);
+		//cout << "sqrt_check:" << sqrt_check << endl;
+		//sqrt_check = 1;
+		if (sqrt_result == 0) {	//整数じゃないとき
+			result.x++;
+			//cout << "rand:" << result.x << endl;
+		}
+		else {
+			sqrt_check = 1;
+			//mpz_sqrt(result.y.get_mpz_t(), rh.get_mpz_t());
+			result.y = sqrt_result;
+		}
+	}
+	return result;
 }
 
 /*** y^2=x^3+xのポイントを生成
