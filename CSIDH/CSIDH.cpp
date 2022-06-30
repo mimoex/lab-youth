@@ -79,7 +79,7 @@ void gen_csidh_key()
 	mod = "5326738796327623094747867617954605554069371494832722337612446642054009560026576537626892113026381253624626941643949444792662881241621373288942880288065659";
 
 	const mpz_class curve_a = 0, curve_b = 1;
-	mpz_class bai, add_temp;;
+	mpz_class bai, add_temp;
 
 	size_t check;
 
@@ -92,7 +92,7 @@ void gen_csidh_key()
 		for (j = 0; j < a[i];j++) {
 			check=0;
 			while (check == 0) {
-				PA = gen_point(A_curve_a, A_curve_b, mod);
+				PA = gen_point_sqrt(A_curve_a, A_curve_b, mod);
 				if (check_point(PA, A_curve_a, A_curve_b, mod) == 0) cout<<"ellisoncurve-OK"<<endl;
 				//cout << "inf?:" << PA.inf << ends;
 				add_fp(mod, 1, mod, &add_temp);
@@ -129,13 +129,14 @@ void gen_csidh_key()
 		for (j = 0; j < b[i]; j++) {
 			check = 0;
 			while (check == 0) {
-				PB = gen_point(B_curve_a, B_curve_b, mod);
-				//if (check_point(P, mod) == 0) cout<<"OK"<<endl;
+				PB = gen_point_sqrt(B_curve_a, B_curve_b, mod);
+				if (check_point(PB, B_curve_a, B_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
 				//cout << "inf?:" << PB.inf << ends;
 				add_fp(mod, 1, mod, &add_temp);
 				div_fp(add_temp, primes[i], mod, &bai);
 				//cout << bai << endl;
 				PB = l_to_r_binary_mont(PB, B_curve_a, B_curve_b, mod, bai);
+				if (check_point(PB, B_curve_a, B_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
 				//cout << "inf(af scalar)?:" << PB.inf << endl;
 				//cout << "P:" << P.x << ", " << P.y << endl;
 				if (PB.inf == 0) {
@@ -161,10 +162,12 @@ void gen_csidh_key()
 		for (j = 0; j < a[i]; j++) {
 			check = 0;
 			while (check == 0) {
-				PBA = gen_point(BA_curve_a, BA_curve_b, mod);
+				PBA = gen_point_sqrt(BA_curve_a, BA_curve_b, mod);
+				if (check_point(PBA, BA_curve_a, BA_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
 				add_fp(mod, 1, mod, &add_temp);
 				div_fp(add_temp, primes[i], mod, &bai);
 				PBA = l_to_r_binary_mont(PBA, BA_curve_a, BA_curve_b, mod, bai);
+				if (check_point(PBA, BA_curve_a, BA_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
 				//cout << "PBA:" << PBA.x << ", " << PBA.y << endl;
 				if (PBA.inf == 0) {
 					//cout << "check OK!" << endl;
@@ -189,10 +192,12 @@ void gen_csidh_key()
 		for (j = 0; j < b[i]; j++) {
 			check = 0;
 			while (check == 0) {
-				PAB = gen_point(AB_curve_a, AB_curve_b, mod);
+				PAB = gen_point_sqrt(AB_curve_a, AB_curve_b, mod);
+				if (check_point(PAB, AB_curve_a, AB_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
 				add_fp(mod, 1, mod, &add_temp);
 				div_fp(add_temp, primes[i], mod, &bai);
 				PAB = l_to_r_binary_mont(PAB, AB_curve_a, AB_curve_b, mod, bai);
+				if (check_point(PAB, AB_curve_a, AB_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
 				if (PAB.inf == 0) {
 					//cout << "check OK!" << endl;
 					check = 1;
@@ -232,5 +237,3 @@ mpz_class gen_primes()
 	cout << bit.size() << endl;
 	return p;
 }
-
-

@@ -182,15 +182,25 @@ mpz_class TonelliShanks(const mpz_class & n, const mpz_class & mod)
 }
 
 
-
+mpz_class sqrt_mod(const mpz_class& n, const mpz_class& p)
+{
+	mpz_class result, check;
+	pow_fp(n, (p - 1) / 2, p, &check);
+	if (check == 1) {
+		pow_fp(n, (p + 1) / 4, p, &result);
+		return result;
+	}
+	else return 0;
+	
+}
 
 /*** xを選んでからyを求める
-	y^2=x^3+a*x^2+x***/
+	b*y^2=x^3+a*x^2+x ***/
 Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mod) {
 	Point result;
 	result.inf = false;
 	size_t mask_bit = 32;
-	mpz_class x, y, x_cube, x_sqr, y_temp, ax2, rh, sqrt_result;
+	mpz_class x, y, x_cube, x_sqr, y_temp, ax2, rh,div_rh, sqrt_result, div_x, div_a, testpow;
 	result.x = random_fp(mod);
 	int sqrt_check = 0;
 
@@ -202,12 +212,12 @@ Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mo
 
 		add_fp(x_cube, ax2, mod, &y_temp);
 		add_fp(y_temp, result.x, mod, &rh);
+
+		div_fp(rh, b, mod, &div_rh);
 		
-		//mpz_sqrt(result.y.get_mpz_t(), rh.get_mpz_t());
-		sqrt_result = TonelliShanks(rh, mod);
-		//cout << "sqrt_check:" << sqrt_check << endl;
-		//sqrt_check = 1;
-		if (sqrt_result == 0) {	//整数じゃないとき
+		//sqrt_result = TonelliShanks(div_rh, mod);
+		sqrt_result = sqrt_mod(div_rh, mod);
+		if (sqrt_result == 0) {	//not整数
 			result.x++;
 			//cout << "rand:" << result.x << endl;
 		}
@@ -215,6 +225,7 @@ Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mo
 			sqrt_check = 1;
 			//mpz_sqrt(result.y.get_mpz_t(), rh.get_mpz_t());
 			result.y = sqrt_result;
+			//cout <<"x,y :"<< result.x<<", " << result.y << endl;
 		}
 	}
 	return result;
@@ -245,7 +256,7 @@ Point gen_point(const mpz_class& a, const mpz_class& b, const mpz_class& mod)
 	return gen_point;
 }
 
-/*** b*y^2=x^3+a*x^2+xのの点であれば0を返す ***/
+/*** b*y^2=x^3+a*x^2+xの点であれば0を返す ***/
 size_t check_point(const Point& p, const mpz_class a, const mpz_class b, const mpz_class& mod)
 {
 	mpz_class test, x_cube, x_sqr, y_sqr, rh, lh, ax2;
@@ -259,9 +270,7 @@ size_t check_point(const Point& p, const mpz_class a, const mpz_class b, const m
 
 	pow_fp(p.y, 2, mod, &y_sqr);
 	mul_fp(b, y_sqr, mod, &lh);
-	sub_fp(rh, lh, mod, &test);
 
-
-	if (test == 0)	return 0;
+	if (lh == rh)	return 0;
 	else			return 1;
 }
