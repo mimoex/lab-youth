@@ -141,12 +141,12 @@ Point montgomery_ec_add(const Point& p, const Point& q, const mpz_class& a, cons
 }
 
 
-Point copy_point(Point &p) {
+Point copy_point(const Point &p) {
 	Point result;
 	result.x= p.x;
 	result.y= p.y;
 	result.inf = p.inf;
-	return p;
+	return result;
 }
 
 
