@@ -7,7 +7,7 @@ size_t Velu(Point& P, mpz_class& a, mpz_class& b, const mpz_class& order, const 
 
 	Point Q, result;
 	mpz_class tQ, tQtemp, uQ, uQtemp, wQ, wQtemp;
-	mpz_class t = 0, w = 0;
+	mpz_class t = 0, w = 0, t_inv=0,pi=1;
 	int i;
 
 	Q.x = 0; Q.y = 0; Q.inf = true;
@@ -15,32 +15,26 @@ size_t Velu(Point& P, mpz_class& a, mpz_class& b, const mpz_class& order, const 
 	for (i = 1; i < order; i++) {
 		Q = montgomery_ec_add(P, Q, a, b, mod);
 
-		//tQ = 3 * Q.x * Q.x + a;
-		pow_fp(Q.x, 2, mod, &tQ);
-		mul_fp(3, tQ, mod, &tQtemp);
-		add_fp(tQtemp, b, mod, &tQ);
-		
-		//uQ = 2 * Q.y * Q.y;
-		pow_fp(Q.y, 2, mod, &tQtemp);
-		mul_fp(2, tQtemp, mod, &uQ);
+		add_fp(t, Q.x, mod, &t);
 
-		//wQ = uQ + tQ * Q.x;
-		mul_fp(tQ, Q.x, mod, &wQtemp);
-		add_fp(uQ, wQtemp, mod, &wQ);
+		div_fp(1, Q.x, mod, &w);
+		add_fp(t_inv, w, mod, &t_inv);
 
-		//t += tQ;
-		add_fp(t, tQ, mod, &t);
-		//w += wQ;
-		add_fp(w, wQ, mod, &w);
+		mul_fp(pi, Q.x, mod, &pi);
 	}
-	//t *= 5;
-	mul_fp(t, 5, mod, &t);
-	//w *= 7;
-	mul_fp(w, 7, mod, &w);
-	//a -= t;
-	sub_fp(b, t, mod, &b);
-	//b -= w;
-	sub_fp(a, w, mod, &a);
+	//a'
+	mpz_class a1, a2, a3, a_temp, pi2;
+	mul_fp(6, t_inv, mod, &a1);
+	mul_fp(6, t, mod, &a2);
+	sub_fp(a1, a2, mod, &a3);
+	add_fp(a3, a, mod, &a_temp);
+	
+	pow_fp(pi, 2, mod, &pi2);
+	
+	mul_fp(a_temp, pi2, mod, &a);
+
+	//b'
+	mul_fp(b, pi2, mod, &b);
 	return 0;
 }
 
@@ -95,8 +89,7 @@ void gen_csidh_key()
 				PA = gen_point_sqrt(A_curve_a, A_curve_b, mod);
 				if (check_point(PA, A_curve_a, A_curve_b, mod) == 0) cout<<"ellisoncurve-OK"<<endl;
 				//cout << "inf?:" << PA.inf << ends;
-				add_fp(mod, 1, mod, &add_temp);
-				div_fp(add_temp, primes[i], mod, &bai);
+				bai = (primes[i] - 1) / 2;
 				//cout << bai << endl;
 				PA=l_to_r_binary_mont(PA, A_curve_a, A_curve_b, mod, bai);
 				if (check_point(PA, A_curve_a, A_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
@@ -132,8 +125,7 @@ void gen_csidh_key()
 				PB = gen_point_sqrt(B_curve_a, B_curve_b, mod);
 				if (check_point(PB, B_curve_a, B_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
 				//cout << "inf?:" << PB.inf << ends;
-				add_fp(mod, 1, mod, &add_temp);
-				div_fp(add_temp, primes[i], mod, &bai);
+				bai = (primes[i] - 1) / 2;
 				//cout << bai << endl;
 				PB = l_to_r_binary_mont(PB, B_curve_a, B_curve_b, mod, bai);
 				if (check_point(PB, B_curve_a, B_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
@@ -164,8 +156,7 @@ void gen_csidh_key()
 			while (check == 0) {
 				PBA = gen_point_sqrt(BA_curve_a, BA_curve_b, mod);
 				if (check_point(PBA, BA_curve_a, BA_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
-				add_fp(mod, 1, mod, &add_temp);
-				div_fp(add_temp, primes[i], mod, &bai);
+				bai = (primes[i] - 1) / 2;
 				PBA = l_to_r_binary_mont(PBA, BA_curve_a, BA_curve_b, mod, bai);
 				if (check_point(PBA, BA_curve_a, BA_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
 				//cout << "PBA:" << PBA.x << ", " << PBA.y << endl;
@@ -194,8 +185,7 @@ void gen_csidh_key()
 			while (check == 0) {
 				PAB = gen_point_sqrt(AB_curve_a, AB_curve_b, mod);
 				if (check_point(PAB, AB_curve_a, AB_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
-				add_fp(mod, 1, mod, &add_temp);
-				div_fp(add_temp, primes[i], mod, &bai);
+				bai = (primes[i] - 1) / 2;
 				PAB = l_to_r_binary_mont(PAB, AB_curve_a, AB_curve_b, mod, bai);
 				if (check_point(PAB, AB_curve_a, AB_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
 				if (PAB.inf == 0) {
