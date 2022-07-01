@@ -36,16 +36,17 @@ void div_fp(const mpz_class& a, const mpz_class& b, const mpz_class& p, mpz_clas
 mpz_class random_fp(const mpz_class& p);
 
 
-Point copy_point(Point& p);
+Point copy_point(const Point& p);
 
 //Weierstrass曲線の加算公式
-Point ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& mod);
+Point ec_add(const Point& p, const Point& q, const mpz_class& a, const mpz_class& mod);
 //Montgomery曲線の加算公式
-Point montgomery_ec_add(Point& p, Point& q, const mpz_class& a, const mpz_class& b, const mpz_class& mod);
+Point montgomery_ec_add(const Point& p, const Point& q, const mpz_class& a, const mpz_class& b, const mpz_class& mod);
 
 //Montgomery曲線のスカラー倍算(バイナリ法)
 Point l_to_r_binary_mont(const Point& p, const mpz_class& a, const mpz_class& b, const mpz_class& mod, const mpz_class& n);
 
 //楕円曲線上の点を生成
 Point gen_point(const mpz_class& a, const mpz_class& b, const mpz_class& mod);
-size_t check_point(const Point& p, const mpz_class& mod);
+size_t check_point(const Point& p, const mpz_class a, const mpz_class b, const mpz_class& mod);
+Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mod);
