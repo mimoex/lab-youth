@@ -191,16 +191,16 @@ mpz_class TonelliShanks(const mpz_class & n, const mpz_class & mod)
 }
 
 
-mpz_class sqrt_mod(const mpz_class& n, const mpz_class& p)
+bool sqrt_mod(const mpz_class& n, const mpz_class& p, mpz_class& result)
 {
-	mpz_class result, check;
-	pow_fp(n, (p - 1) / 2, p, &check);
-	if (check == 1) {
-		pow_fp(n, (p + 1) / 4, p, &result);
-		return result;
+	mpz_class check;
+	pow_fp(n, (p + 1) / 4, p, &result);
+
+	pow_fp(result, 2, p, &check);
+	if (check == n) {
+		return true;
 	}
-	else return 0;
-	
+	else return false;
 }
 
 /*** xを選んでからyを求める
@@ -212,6 +212,7 @@ Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mo
 	mpz_class x, y, x_cube, x_sqr, y_temp, ax2, rh,div_rh, sqrt_result, div_x, div_a, testpow;
 	result.x = random_fp(mod);
 	int sqrt_check = 0;
+	bool issqrt;
 
 	while (sqrt_check == 0) {
 		pow_fp(result.x, 3, mod, &x_cube);
@@ -224,17 +225,13 @@ Point gen_point_sqrt(const mpz_class& a, const mpz_class& b, const mpz_class& mo
 
 		div_fp(rh, b, mod, &div_rh);
 		
-		//sqrt_result = TonelliShanks(div_rh, mod);
-		sqrt_result = sqrt_mod(div_rh, mod);
-		if (sqrt_result == 0) {	//not整数
+		issqrt = sqrt_mod(div_rh, mod, sqrt_result);
+		if (issqrt == false) {	//整数じゃないとき
 			result.x++;
-			//cout << "rand:" << result.x << endl;
 		}
 		else {
 			sqrt_check = 1;
-			//mpz_sqrt(result.y.get_mpz_t(), rh.get_mpz_t());
 			result.y = sqrt_result;
-			//cout <<"x,y :"<< result.x<<", " << result.y << endl;
 		}
 	}
 	return result;
