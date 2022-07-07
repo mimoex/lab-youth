@@ -6,11 +6,13 @@ size_t Velu(Point& P, mpz_class& a, mpz_class& b, const mpz_class& order, const 
 	//if (check_point(P, mod) == 1) { cout << "違う" << endl; return 1; }
 
 	Point Q, result;
-	mpz_class tQ, tQtemp, uQ, uQtemp, wQ, wQtemp;
+	mpz_class tQ, tQtemp, uQ, uQtemp, wQ, wQtemp, d;
 	mpz_class t = 0, w = 0, t_inv=0,pi=1;
 	int i;
 
 	Q.x = 0; Q.y = 0; Q.inf = true;
+
+	d = (order - 1) / 2;
 
 	for (i = 1; i < order; i++) {
 		Q = montgomery_ec_add(P, Q, a, b, mod);
@@ -89,7 +91,7 @@ void gen_csidh_key()
 				PA = gen_point_sqrt(A_curve_a, A_curve_b, mod);
 				if (check_point(PA, A_curve_a, A_curve_b, mod) == 0) cout<<"ellisoncurve-OK"<<endl;
 				//cout << "inf?:" << PA.inf << ends;
-				bai = (primes[i] - 1) / 2;
+				div_fp((mod + 1), primes[i], mod, &bai);
 				//cout << bai << endl;
 				PA=l_to_r_binary_mont(PA, A_curve_a, A_curve_b, mod, bai);
 				if (check_point(PA, A_curve_a, A_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
@@ -125,7 +127,7 @@ void gen_csidh_key()
 				PB = gen_point_sqrt(B_curve_a, B_curve_b, mod);
 				if (check_point(PB, B_curve_a, B_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
 				//cout << "inf?:" << PB.inf << ends;
-				bai = (primes[i] - 1) / 2;
+				div_fp((mod + 1), primes[i], mod, &bai);
 				//cout << bai << endl;
 				PB = l_to_r_binary_mont(PB, B_curve_a, B_curve_b, mod, bai);
 				if (check_point(PB, B_curve_a, B_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
@@ -156,7 +158,7 @@ void gen_csidh_key()
 			while (check == 0) {
 				PBA = gen_point_sqrt(BA_curve_a, BA_curve_b, mod);
 				if (check_point(PBA, BA_curve_a, BA_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
-				bai = (primes[i] - 1) / 2;
+				div_fp((mod + 1), primes[i], mod, &bai);
 				PBA = l_to_r_binary_mont(PBA, BA_curve_a, BA_curve_b, mod, bai);
 				if (check_point(PBA, BA_curve_a, BA_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
 				//cout << "PBA:" << PBA.x << ", " << PBA.y << endl;
@@ -185,7 +187,7 @@ void gen_csidh_key()
 			while (check == 0) {
 				PAB = gen_point_sqrt(AB_curve_a, AB_curve_b, mod);
 				if (check_point(PAB, AB_curve_a, AB_curve_b, mod) == 0) cout << "ellisoncurve-OK" << endl;
-				bai = (primes[i] - 1) / 2;
+				div_fp((mod + 1), primes[i], mod, &bai);
 				PAB = l_to_r_binary_mont(PAB, AB_curve_a, AB_curve_b, mod, bai);
 				if (check_point(PAB, AB_curve_a, AB_curve_b, mod) == 0) cout << "ellisoncurve-OK2" << endl;
 				if (PAB.inf == 0) {
